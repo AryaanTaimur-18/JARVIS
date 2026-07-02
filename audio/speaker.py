@@ -1,5 +1,6 @@
 import asyncio
 from pathlib import Path
+import uuid
 
 import edge_tts
 import pygame
@@ -36,14 +37,30 @@ class Speaker:
 
     def speak(self, text):
 
-        output_file = self.output_folder / "speech.mp3"
+        # Generate a unique filename for every response
+        output_file = self.output_folder / f"{uuid.uuid4()}.mp3"
 
-        asyncio.run(
-            self._generate(text, output_file)
-        )
+        try:
+            # Generate speech
+            asyncio.run(
+                self._generate(text, output_file)
+            )
 
-        pygame.mixer.music.load(str(output_file))
-        pygame.mixer.music.play()
+            # Play the audio
+            pygame.mixer.music.load(str(output_file))
+            pygame.mixer.music.play()
 
-        while pygame.mixer.music.get_busy():
-            pygame.time.Clock().tick(10)
+            # Wait until playback finishes
+            while pygame.mixer.music.get_busy():
+                pygame.time.Clock().tick(10)
+
+        finally:
+            # Release the file before deleting it
+            try:
+                pygame.mixer.music.unload()
+            except Exception:
+                pass
+
+            # Delete the temporary audio file
+            if output_file.exists():
+                output_file.unlink()

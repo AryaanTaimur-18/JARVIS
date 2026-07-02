@@ -1,27 +1,11 @@
-from audio.recorder import AudioRecorder
-from audio.transcriber import AudioTranscriber
-from audio.speaker import Speaker
+from brain.assistant import JarvisAssistant
 
 
 def main():
 
-    recorder = AudioRecorder()
+    jarvis = JarvisAssistant()
 
-    transcriber = AudioTranscriber()
-
-    speaker = Speaker()
-
-    input("Press Enter to record...")
-
-    audio_file = recorder.record(duration=5)
-
-    print("\nTranscribing...\n")
-
-    text = transcriber.transcribe(audio_file)
-
-    print(f"You said: {text}")
-
-    speaker.speak(text)
+    jarvis.run()
 
 
 if __name__ == "__main__":
