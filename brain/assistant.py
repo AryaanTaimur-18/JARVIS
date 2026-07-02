@@ -3,6 +3,7 @@ from audio.transcriber import AudioTranscriber
 from audio.speaker import Speaker
 from brain.llm import LLM
 from memory.conversation import ConversationMemory
+from skills.manager import SkillManager
 
 
 class JarvisAssistant:
@@ -19,6 +20,7 @@ class JarvisAssistant:
         self.speaker = Speaker()
         self.llm = LLM()
         self.memory = ConversationMemory()
+        self.skill_manager = SkillManager()
 
         print("JARVIS is ready!\n")
 
@@ -36,9 +38,13 @@ class JarvisAssistant:
 
         print("Thinking...\n")
 
-        response = self.llm.chat(
-        self.memory.get_messages()
-        )
+        response = self.skill_manager.execute(text)
+
+        if response is None:
+
+            response = self.llm.chat(
+                self.memory.get_messages()
+            )
 
         print(f"JARVIS: {response}\n")
 
