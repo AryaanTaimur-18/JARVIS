@@ -1,9 +1,14 @@
 from datetime import datetime
+from tools.decorators import tool
 import subprocess
 
 
 class SystemSkills:
 
+    @tool(
+    name="open_notepad",
+    description="Open Microsoft Notepad."
+    )
     def open_notepad(self):
 
         subprocess.Popen("notepad.exe")

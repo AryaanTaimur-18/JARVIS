@@ -1,0 +1,3 @@
+PS C:\Users\Aryaan> cd C:\JARVIS
+PS C:\JARVIS> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+PS C:\JARVIS> .\.venv\Scripts\Activate.ps1

@@ -17,7 +17,11 @@ class SkillManager:
         elif "time" in command:
             return self.system.get_time()
 
-        elif "date" in command:
+        elif (
+        "date" in command
+        or "day" in command
+        or "today" in command
+        ):
             return self.system.get_date()
 
         return None
