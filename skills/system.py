@@ -1,28 +1,33 @@
-from datetime import datetime
-from tools.decorators import tool
 import subprocess
+from datetime import datetime
+
+from tools.decorators import tool
 
 
-class SystemSkills:
-
-    @tool(
+@tool(
     name="open_notepad",
     description="Open Microsoft Notepad."
-    )
-    def open_notepad(self):
+)
+def open_notepad():
 
-        subprocess.Popen("notepad.exe")
+    subprocess.Popen("notepad.exe")
 
-        return "Opening Notepad."
+    return "Opening Notepad."
 
-    def get_time(self):
 
-        current_time = datetime.now().strftime("%I:%M %p")
+@tool(
+    name="get_time",
+    description="Returns the current system time."
+)
+def get_time():
 
-        return f"The current time is {current_time}."
+    return datetime.now().strftime("%I:%M %p")
 
-    def get_date(self):
 
-        current_date = datetime.now().strftime("%A, %d %B %Y")
+@tool(
+    name="get_date",
+    description="Returns today's date."
+)
+def get_date():
 
-        return f"Today is {current_date}."
+    return datetime.now().strftime("%A, %d %B %Y")

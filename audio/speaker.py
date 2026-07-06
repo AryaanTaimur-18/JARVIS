@@ -37,6 +37,9 @@ class Speaker:
 
     def speak(self, text):
 
+        if not text:
+            return
+
         # Generate a unique filename for every response
         output_file = self.output_folder / f"{uuid.uuid4()}.mp3"
 

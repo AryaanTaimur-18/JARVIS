@@ -3,7 +3,8 @@ from audio.transcriber import AudioTranscriber
 from audio.speaker import Speaker
 from brain.llm import LLM
 from memory.conversation import ConversationMemory
-from skills.manager import SkillManager
+from tools.manager import ToolManager
+from tools.loader import ToolLoader
 
 
 class JarvisAssistant:
@@ -18,10 +19,28 @@ class JarvisAssistant:
         self.recorder = AudioRecorder()
         self.transcriber = AudioTranscriber()
         self.speaker = Speaker()
-        self.llm = LLM()
+        from brain.agent import Agent
+        self.agent = Agent()
         self.memory = ConversationMemory()
-        self.skill_manager = SkillManager()
+            
+        print("Loading skills...")
 
+        self.loader = ToolLoader()
+        self.loader.load()
+
+        self.tool_manager = ToolManager()
+
+        print("All skills loaded.")
+
+        from tools.registry import registry
+
+        print("\nRegistered Tools:\n")
+
+        for tool in registry.all().values():
+
+            print(tool["name"])
+
+        
         print("JARVIS is ready!\n")
 
     def listen_once(self):
@@ -38,11 +57,7 @@ class JarvisAssistant:
 
         print("Thinking...\n")
 
-        response = self.skill_manager.execute(text)
-
-        if response is None:
-
-            response = self.llm.chat(
+        response = self.agent.chat(
                 self.memory.get_messages()
             )
 

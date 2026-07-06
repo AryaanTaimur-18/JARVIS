@@ -1,3 +1,13 @@
 PS C:\Users\Aryaan> cd C:\JARVIS
 PS C:\JARVIS> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 PS C:\JARVIS> .\.venv\Scripts\Activate.ps1
+
+Registry → Stores tools.
+Decorators → Register tools.
+Adapter → Convert tools to the API format.
+LLM → Talk to the model.
+ToolManager → Execute tools.
+Speaker → Speak.
+Recorder → Record.
+
+

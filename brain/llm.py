@@ -15,12 +15,17 @@ class LLM:
 
         self.model = "qwen2.5-7b-instruct"
 
-    def chat(self, messages):
+    def chat(self, messages, tools=None):
 
         response = self.client.chat.completions.create(
-        model=self.model,
-        messages=messages,
-        temperature=0.7,
+            model=self.model,
+            messages=messages,
+            temperature=0.7,
+            tools=tools
         )
 
-        return response.choices[0].message.content
+        print("\n===== RAW RESPONSE =====")
+        print(response)
+        print("========================\n")
+
+        return response

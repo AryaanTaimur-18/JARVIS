@@ -20,7 +20,6 @@ def tool(
             detected_parameters = {}
 
             for parameter in signature.parameters.values():
-
                 detected_parameters[parameter.name] = "string"
 
         registry.register(
