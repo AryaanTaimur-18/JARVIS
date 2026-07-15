@@ -22,22 +22,40 @@ class Agent:
 
         message = response.choices[0].message
 
-        # Normal response
         if not message.tool_calls:
             return message.content
 
-        # First requested tool
-        tool_call = message.tool_calls[0]
+        results = {}
 
-        tool_name = tool_call.function.name
-        arguments = json.loads(tool_call.function.arguments)
+        for tool_call in message.tool_calls:
 
-        print(f"\nTool Requested: {tool_name}")
-        print(f"Arguments: {arguments}")
+            tool_name = tool_call.function.name
+            arguments = json.loads(tool_call.function.arguments)
 
-        result = self.tool_manager.execute(
-            tool_name,
-            **arguments
+            print(f"\nTool Requested: {tool_name}")
+            print(f"Arguments: {arguments}")
+
+            result = self.tool_manager.execute(
+                tool_name,
+                **arguments
+            )
+
+            results[tool_name] = result
+
+            agent_messages.append(
+            {
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": str(result)
+            }
         )
-
-        return result
+            
+        agent_messages = messages.copy()
+        
+        agent_messages.append(
+        {
+        "role": "assistant",
+        "content": message.content,
+        "tool_calls": message.tool_calls
+        }
+    )

@@ -19,3 +19,21 @@
 - Execute multiple tool calls.
 - Send tool results back to the LLM.
 - Produce natural responses after tool execution.
+
+## Milestone: Agent Core Completed
+
+Today I completed the core architecture of JARVIS.
+
+The agent now follows the OpenAI function-calling workflow:
+1. Sends the conversation and available tools to the LLM.
+2. Receives one or more tool calls.
+3. Executes each requested tool.
+4. Builds a temporary conversation containing the assistant's tool requests and tool outputs.
+5. Sends the updated conversation back to the LLM.
+6. Returns a natural-language response to the user.
+
+This separates responsibilities cleanly:
+- The LLM decides *what* to do.
+- The ToolManager performs the actions.
+- The Agent coordinates the interaction.
+- ConversationMemory remains free of internal tool messages.
