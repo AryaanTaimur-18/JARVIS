@@ -11,3 +11,124 @@ Speaker → Speak.
 Recorder → Record.
 
 
+######################################################
+
+📖 README.md
+
+Purpose: Introduce the project.
+
+Include:
+
+What JARVIS is.
+Features.
+Installation.
+Usage.
+Project structure.
+Screenshots (later).
+
+This is for anyone visiting your GitHub repository.
+
+📝 CHANGELOG.md
+
+Purpose: Track released versions, not daily work.
+
+Example:
+
+# Changelog
+
+## v0.3.0
+
+### Added
+- OpenAI-compatible tool calling
+- Multi-tool execution
+- Tool registry
+
+### Changed
+- Refactored assistant into Agent class
+
+### Fixed
+- Multiple tool execution bug
+
+Think of this as "what changed between versions."
+
+🏗 ARCHITECTURE.md
+
+Purpose: Explain how the system is designed.
+
+For example:
+
+User
+  ↓
+Recorder
+  ↓
+Whisper
+  ↓
+Agent
+ ├── LLM
+ ├── Tool Manager
+ └── Memory
+  ↓
+Speaker
+
+This file changes only when your architecture changes significantly.
+
+🚀 ROADMAP.md
+
+Purpose: Future plans.
+
+Example:
+
+## Phase 1
+- [x] Voice recording
+- [x] Whisper
+- [x] Tool calling
+
+## Phase 2
+- [ ] Browser automation
+- [ ] File management
+- [ ] Calendar
+
+## Phase 3
+- [ ] Vision
+- [ ] Wake word
+- [ ] Autonomous planning
+
+It answers: "What's next?"
+
+📓 DEVLOG.md ⭐
+
+This is where I would put what we've been writing after each milestone.
+
+Example:
+
+# Development Log
+
+## 2026-07-15
+
+### Milestone: Agent Workflow
+
+Today I completed the OpenAI-style tool execution loop.
+
+The agent now:
+- Sends available tools to the LLM.
+- Executes one or more tool calls.
+- Builds a temporary conversation.
+- Performs a second LLM pass.
+- Returns natural-language responses.
+
+Lessons learned:
+- Assistant tool-call messages must precede tool responses.
+- Each tool response requires its own `tool_call_id`.
+- Keeping conversation memory separate from internal agent messages simplifies the architecture.
+
+This becomes a journal of how the project evolved.
+
+What I'd use for a portfolio-quality project
+
+I'd keep all five:
+
+✅ README.md → What the project is.
+✅ CHANGELOG.md → Version history.
+✅ ROADMAP.md → Planned features.
+✅ ARCHITECTURE.md → System design.
+✅ DEVLOG.md → Development diary.
