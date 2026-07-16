@@ -9,6 +9,7 @@ class Agent:
 
     def __init__(self):
 
+
         self.llm = LLM()
         self.tool_manager = ToolManager()
         self.adapter = OpenAIToolAdapter()
@@ -25,8 +26,21 @@ class Agent:
         if not message.tool_calls:
             return message.content
 
+        # Temporary conversation for the second LLM call
+        agent_messages = messages.copy()
+
+        # Preserve the assistant's tool requests
+        agent_messages.append(
+            {
+                "role": "assistant",
+                "content": message.content,
+                "tool_calls": message.tool_calls
+            }
+        )
+
         results = {}
 
+        # Execute every requested tool
         for tool_call in message.tool_calls:
 
             tool_name = tool_call.function.name
@@ -42,20 +56,17 @@ class Agent:
 
             results[tool_name] = result
 
+            # Add one tool message for THIS tool
             agent_messages.append(
-            {
-                "role": "tool",
-                "tool_call_id": tool_call.id,
-                "content": str(result)
-            }
-        )
-            
-        agent_messages = messages.copy()
+                {
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "content": str(result)
+                }
+            )
+
+        # Second LLM call
+        final_response = self.llm.chat(agent_messages)
+
+        return final_response.choices[0].message.content
         
-        agent_messages.append(
-        {
-        "role": "assistant",
-        "content": message.content,
-        "tool_calls": message.tool_calls
-        }
-    )
