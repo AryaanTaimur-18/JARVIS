@@ -64,3 +64,35 @@ def open_application(application_name):
 
     except Exception as e:
         return f"Failed to open {application_name}: {e}"
+    
+import webbrowser
+
+WEBSITES = {
+    "google": "https://www.google.com",
+    "youtube": "https://www.youtube.com",
+    "github": "https://github.com",
+    "linkedin": "https://www.linkedin.com",
+    "chatgpt": "https://chat.openai.com",
+    "gmail": "https://mail.google.com",
+}
+
+
+@tool(
+    name="open_website",
+    description="Open a website by name."
+)
+def open_website(website_name):
+
+    website_name = website_name.lower()
+
+    url = WEBSITES.get(website_name)
+
+    if url is None:
+        return f"Sorry, I don't know how to open '{website_name}'."
+
+    try:
+        webbrowser.open(url)
+        return f"Opening {website_name.title()}."
+
+    except Exception as e:
+        return f"Failed to open {website_name}: {e}"
