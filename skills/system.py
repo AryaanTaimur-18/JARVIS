@@ -96,3 +96,26 @@ def open_website(website_name):
 
     except Exception as e:
         return f"Failed to open {website_name}: {e}"
+    
+from pathlib import Path
+
+@tool(
+    name="create_folder",
+    description="Create a folder on the desktop."
+)
+def create_folder(folder_name):
+    desktop = Path.home() / "Desktop"
+    folder_path = desktop / folder_name
+
+    print(Path.home())
+    print(desktop)
+    print(folder_path)
+
+    try:
+        folder_path.mkdir(parents=True)
+        return f"Created folder '{folder_name}' successfully."
+
+    except Exception as e:
+        return f"Failed to create folder '{folder_name}': {e}"
+    
+    
