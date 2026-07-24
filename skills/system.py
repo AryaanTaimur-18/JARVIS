@@ -111,8 +111,12 @@ def create_folder(folder_name):
     print(desktop)
     print(folder_path)
 
+    if folder_path.exists():
+        return f"The folder '{folder_name}' already exists."
+
     try:
         folder_path.mkdir(parents=True)
+        print("Exists after mkdir:", folder_path.exists())
         return f"Created folder '{folder_name}' successfully."
 
     except Exception as e:
