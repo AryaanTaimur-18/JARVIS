@@ -104,7 +104,11 @@ from pathlib import Path
     description="Create a folder on the desktop."
 )
 def create_folder(folder_name):
-    desktop = Path.home() / "Desktop"
+    
+    from utils.paths import get_desktop
+
+    desktop = get_desktop()
+
     folder_path = desktop / folder_name
 
     print(Path.home())
