@@ -85,7 +85,10 @@ def open_website(website_name):
 
     website_name = website_name.lower()
 
-    url = WEBSITES.get(website_name)
+    if website_name.startswith(("http://", "https://")):
+        url = website_name
+    else:
+        url = WEBSITES.get(website_name)
 
     if url is None:
         return f"Sorry, I don't know how to open '{website_name}'."
