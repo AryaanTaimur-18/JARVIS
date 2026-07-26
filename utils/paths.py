@@ -14,3 +14,13 @@ def get_desktop():
         return onedrive_desktop
 
     return Path.home() / "Desktop"
+
+def get_documents():
+    return Path.home() / "Documents"
+
+def get_downloads():
+    return Path.home() / "Downloads"
+
+def get_pictures():
+    return Path.home() / "Pictures"
+
