@@ -1,9 +1,11 @@
 import subprocess
-from datetime import datetime
+import webbrowser
+import os
 
+from urllib.parse import quote_plus
+from datetime import datetime
 from tools.decorators import tool
 
-import os
 
 from utils.paths import (
     get_desktop,
@@ -85,6 +87,14 @@ WEBSITES = {
     "gmail": "https://mail.google.com",
 }
 
+SEARCH_URLS = {
+    "google": "https://www.google.com/search?q=",
+    "youtube": "https://www.youtube.com/results?search_query=",
+    "github": "https://github.com/search?q=",
+    "linkedin": "https://www.linkedin.com/search/results/all/?keywords=",
+    "stackoverflow": "https://stackoverflow.com/search?q=",
+    "chatgpt": "https://chat.openai.com/?q="
+}
 
 @tool(
     name="open_website",
@@ -108,6 +118,33 @@ def open_website(website_name):
 
     except Exception as e:
         return f"Failed to open {website_name}: {e}"
+
+@tool(
+    name="search_web",
+    description=(
+        "Search a supported platform for a query. "
+        "Supported platforms include google, youtube, github, linkedin, stackoverflow and chatgpt."
+    )
+)
+def search_web(platform, query):
+
+    platform = platform.lower()
+
+    base_url = SEARCH_URLS.get(platform)
+
+    if base_url is None:
+        return f"Sorry, I don't support searching on '{platform}'."
+
+    encoded_query = quote_plus(query)
+
+    url = base_url + encoded_query
+
+    try:
+        webbrowser.open(url)
+        return f"Searching {platform.title()} for '{query}'."
+
+    except Exception as e:
+        return f"Failed to search {platform}: {e}"
     
 from pathlib import Path
 
