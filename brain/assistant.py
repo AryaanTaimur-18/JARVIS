@@ -7,7 +7,7 @@ from tools.manager import ToolManager
 from tools.loader import ToolLoader
 
 
-class JarvisAssistant:
+class Assistant:
     """
     Main controller of the assistant.
     """
@@ -43,6 +43,18 @@ class JarvisAssistant:
         
         print("JARVIS is ready!\n")
 
+    def process(self, text):
+
+        self.memory.add_user_message(text)
+
+        response = self.agent.chat(
+            self.memory.get_messages()
+        )
+
+        self.memory.add_assistant_message(response)
+
+        return response
+
     def listen_once(self):
 
         input("Press Enter to start recording...")
@@ -57,13 +69,9 @@ class JarvisAssistant:
 
         print("Thinking...\n")
 
-        response = self.agent.chat(
-                self.memory.get_messages()
-            )
+        response = self.process(text)
 
         print(f"JARVIS: {response}\n")
-
-        self.memory.add_assistant_message(response)
 
         self.speaker.speak(response)
     

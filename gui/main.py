@@ -9,7 +9,11 @@ def run():
 
     app = QApplication(sys.argv)
 
-    window = JarvisWindow()
+    from brain.assistant import Assistant
+
+    assistant = Assistant()
+
+    window = JarvisWindow(assistant)
     window.show()
 
     sys.exit(app.exec())
