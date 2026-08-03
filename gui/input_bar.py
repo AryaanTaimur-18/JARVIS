@@ -42,3 +42,14 @@ class InputBar(QWidget):
         self.send_message.emit(text)
 
         self.textbox.clear()
+
+    def set_enabled(self, enabled):
+
+        self.textbox.setEnabled(enabled)
+        self.send_button.setEnabled(enabled)
+        self.mic_button.setEnabled(enabled)
+
+
+    def focus(self):
+
+        self.textbox.setFocus()
