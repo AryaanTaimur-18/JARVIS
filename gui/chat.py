@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import QTextEdit
 from PySide6.QtGui import QTextCursor
+from datetime import datetime
 
 
 class ChatWidget(QTextEdit):
@@ -17,9 +18,13 @@ class ChatWidget(QTextEdit):
         f"<b style='color:#4FC3F7;'>You:</b> {message}<br>"
         )
 
+        self.scroll_to_bottom()
+
         self.append(
         f"<p><b style='color:#4FC3F7;'>You:</b> {message}</p>"
         )
+
+        self.scroll_to_bottom()
 
         self.moveCursor(QTextCursor.End)
 
@@ -29,9 +34,13 @@ class ChatWidget(QTextEdit):
         f"<b style='color:#81C784;'>JARVIS:</b> {message}<br>"
         )
 
+        self.scroll_to_bottom()
+
         self.append(
         f"<p><b style='color:#81C784;'>JARVIS:</b> {message}</p>"
         )
+
+        self.scroll_to_bottom()
 
         self.moveCursor(QTextCursor.End)
 
@@ -46,3 +55,13 @@ class ChatWidget(QTextEdit):
             f"{message}"
             f"</p>"
         )
+        self.scroll_to_bottom()
+
+    def timestamp():
+
+        return datetime.now().strftime("%H:%M")
+
+    def scroll_to_bottom(self):
+
+        scrollbar = self.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())

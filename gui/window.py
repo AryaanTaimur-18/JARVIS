@@ -12,6 +12,8 @@ from gui.status_bar import StatusBar
 from events.event_bus import event_bus
 from events.constants import Events
 
+from gui.messages import TOOL_MESSAGES
+
 
 class JarvisWindow(QMainWindow):
 
@@ -92,7 +94,16 @@ class JarvisWindow(QMainWindow):
 
         # Welcome message
         self.chat.add_assistant_message(
-        "Hello! I'm JARVIS. How can I help you today?"
+        """👋 Hello! I'm JARVIS.
+
+        I'm ready to help you with:
+
+        • Opening applications
+        • Browsing the web
+        • Creating folders
+        • Taking screenshots
+
+        How can I assist you today?"""
         )
 
         self.status.set_ready()
@@ -162,8 +173,18 @@ class JarvisWindow(QMainWindow):
             result
     ):
 
+        message = TOOL_MESSAGES.get(tool_name)
+
+        if message:
+
             self.chat.add_system_message(
-                f"✅ {tool_name} completed."
+                message["success"]
+            )
+
+        else:
+
+            self.chat.add_system_message(
+                "✅ Tool completed."
             )
     def on_tool_failed(
             self,
@@ -172,12 +193,32 @@ class JarvisWindow(QMainWindow):
             error
     ):
 
+        message = TOOL_MESSAGES.get(tool_name)
+
+        if message:
+
             self.chat.add_system_message(
-                f"❌ {tool_name} failed."
+                message["failed"]
+            )
+
+        else:
+
+            self.chat.add_system_message(
+                "❌ Tool failed."
             )
     def on_tool_started(self, tool_name, arguments):
 
-        self.chat.add_system_message(
-            f"🛠 Executing {tool_name}..."
-        )
+        message = TOOL_MESSAGES.get(tool_name)
+
+        if message:
+
+            self.chat.add_system_message(
+                message["started"]
+            )
+
+        else:
+
+            self.chat.add_system_message(
+                "🛠 Executing tool..."
+            )
 
