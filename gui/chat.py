@@ -38,3 +38,11 @@ class ChatWidget(QTextEdit):
     def clear_chat(self):
 
         self.clear()
+
+    def add_system_message(self, message):
+
+        self.append(
+            f"<p style='color:#BBBBBB;'>"
+            f"{message}"
+            f"</p>"
+        )

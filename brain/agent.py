@@ -3,7 +3,9 @@ import json
 from brain.llm import LLM
 from tools.manager import ToolManager
 from tools.adapter import OpenAIToolAdapter
+from events.event_bus import event_bus
 
+from events.constants import Events
 
 class Agent:
 
@@ -11,7 +13,9 @@ class Agent:
 
 
         self.llm = LLM()
+
         self.tool_manager = ToolManager()
+
         self.adapter = OpenAIToolAdapter()
 
     def chat(self, messages):
@@ -49,10 +53,37 @@ class Agent:
             print(f"\nTool Requested: {tool_name}")
             print(f"Arguments: {arguments}")
 
-            result = self.tool_manager.execute(
-                tool_name,
-                **arguments
+
+            event_bus.emit(
+                Events.TOOL_STARTED,
+                tool_name=tool_name,
+                arguments=arguments
             )
+
+            try:
+
+                result = self.tool_manager.execute(
+                    tool_name,
+                    **arguments
+                )
+
+                event_bus.emit(
+                    Events.TOOL_SUCCEEDED,
+                    tool_name=tool_name,
+                    arguments=arguments,
+                    result=result
+                )
+
+            except Exception as e:
+
+                event_bus.emit(
+                    Events.TOOL_FAILED,
+                    tool_name=tool_name,
+                    arguments=arguments,
+                    error=str(e)
+                )
+
+                raise
 
             results[tool_name] = result
 

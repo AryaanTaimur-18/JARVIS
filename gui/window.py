@@ -9,6 +9,8 @@ from PySide6.QtWidgets import (
 from gui.chat import ChatWidget
 from gui.input_bar import InputBar
 from gui.status_bar import StatusBar
+from events.event_bus import event_bus
+from events.constants import Events
 
 
 class JarvisWindow(QMainWindow):
@@ -60,6 +62,31 @@ class JarvisWindow(QMainWindow):
 
         self.thread.start()
 
+        event_bus.on(
+            Events.THINKING_STARTED,
+            self.on_thinking_started
+        )
+
+        event_bus.on(
+            Events.THINKING_FINISHED,
+            self.on_thinking_finished
+        )
+
+        event_bus.on(
+            Events.TOOL_STARTED,
+            self.on_tool_started
+        )
+
+        event_bus.on(
+            Events.TOOL_SUCCEEDED,
+            self.on_tool_succeeded
+        )
+
+        event_bus.on(
+            Events.TOOL_FAILED,
+            self.on_tool_failed
+        )
+
         # Signals
         self.input_bar.send_message.connect(self.handle_user_message)
 
@@ -76,8 +103,6 @@ class JarvisWindow(QMainWindow):
 
         self.chat.add_user_message(message)
 
-        self.status.set_thinking()
-
         self.input_bar.set_enabled(False)
 
         self.process_message.emit(message)
@@ -86,16 +111,73 @@ class JarvisWindow(QMainWindow):
 
         self.chat.add_assistant_message(response)
 
+    def closeEvent(self, event):
+
+        event_bus.off(
+            Events.THINKING_STARTED,
+            self.on_thinking_started
+        )
+
+        event_bus.off(
+            Events.THINKING_FINISHED,
+            self.on_thinking_finished
+        )
+
+        event_bus.off(
+            Events.TOOL_STARTED,
+            self.on_tool_started
+        )
+
+        event_bus.off(
+            Events.TOOL_SUCCEEDED,
+            self.on_tool_succeeded
+        )
+
+        event_bus.off(
+            Events.TOOL_FAILED,
+            self.on_tool_failed
+        )
+
+        self.thread.quit()
+        self.thread.wait()
+
+        event.accept()
+
+    def on_thinking_started(self):
+
+        self.status.set_thinking()
+
+    def on_thinking_finished(self):
+
         self.status.set_ready()
 
         self.input_bar.set_enabled(True)
 
         self.input_bar.focus()
 
-    def closeEvent(self, event):
+    def on_tool_succeeded(
+            self,
+            tool_name,
+            arguments,
+            result
+    ):
 
-        self.thread.quit()
+            self.chat.add_system_message(
+                f"✅ {tool_name} completed."
+            )
+    def on_tool_failed(
+            self,
+            tool_name,
+            arguments,
+            error
+    ):
 
-        self.thread.wait()
+            self.chat.add_system_message(
+                f"❌ {tool_name} failed."
+            )
+    def on_tool_started(self, tool_name, arguments):
 
-        event.accept()
+        self.chat.add_system_message(
+            f"🛠 Executing {tool_name}..."
+        )
+

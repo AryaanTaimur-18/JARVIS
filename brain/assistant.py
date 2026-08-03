@@ -5,6 +5,7 @@ from brain.llm import LLM
 from memory.conversation import ConversationMemory
 from tools.manager import ToolManager
 from tools.loader import ToolLoader
+from events.event_bus import event_bus
 
 
 class Assistant:
@@ -47,9 +48,16 @@ class Assistant:
 
         self.memory.add_user_message(text)
 
-        response = self.agent.chat(
-            self.memory.get_messages()
-        )
+        from events.constants import Events
+
+        event_bus.emit(Events.THINKING_STARTED)
+
+        try:
+            response = self.agent.chat(
+                self.memory.get_messages()
+            )
+        finally:
+            event_bus.emit(Events.THINKING_FINISHED)
 
         self.memory.add_assistant_message(response)
 
