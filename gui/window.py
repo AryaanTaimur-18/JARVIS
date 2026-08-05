@@ -9,10 +9,11 @@ from PySide6.QtWidgets import (
 from gui.chat import ChatWidget
 from gui.input_bar import InputBar
 from gui.status_bar import StatusBar
-from events.event_bus import event_bus
 from events.constants import Events
 
 from gui.messages import TOOL_MESSAGES
+
+from gui.typewriter import TypeWriter
 
 
 class JarvisWindow(QMainWindow):
@@ -64,30 +65,27 @@ class JarvisWindow(QMainWindow):
 
         self.thread.start()
 
-        event_bus.on(
-            Events.THINKING_STARTED,
+        self.worker.thinking_started.connect(
             self.on_thinking_started
         )
 
-        event_bus.on(
-            Events.THINKING_FINISHED,
+        self.worker.thinking_finished.connect(
             self.on_thinking_finished
         )
 
-        event_bus.on(
-            Events.TOOL_STARTED,
+        self.worker.tool_started.connect(
             self.on_tool_started
         )
 
-        event_bus.on(
-            Events.TOOL_SUCCEEDED,
+        self.worker.tool_finished.connect(
             self.on_tool_succeeded
         )
 
-        event_bus.on(
-            Events.TOOL_FAILED,
+        self.worker.tool_failed.connect(
             self.on_tool_failed
         )
+
+        self.typewriter = TypeWriter()
 
         # Signals
         self.input_bar.send_message.connect(self.handle_user_message)
@@ -120,34 +118,17 @@ class JarvisWindow(QMainWindow):
 
     def handle_assistant_response(self, response):
 
-        self.chat.add_assistant_message(response)
+        self.typewriter.start(
+            response,
+            self.update_typing
+        )
+    def update_typing(self, partial_text):
+
+        self.chat.update_last_assistant_message(
+            partial_text
+        )
 
     def closeEvent(self, event):
-
-        event_bus.off(
-            Events.THINKING_STARTED,
-            self.on_thinking_started
-        )
-
-        event_bus.off(
-            Events.THINKING_FINISHED,
-            self.on_thinking_finished
-        )
-
-        event_bus.off(
-            Events.TOOL_STARTED,
-            self.on_tool_started
-        )
-
-        event_bus.off(
-            Events.TOOL_SUCCEEDED,
-            self.on_tool_succeeded
-        )
-
-        event_bus.off(
-            Events.TOOL_FAILED,
-            self.on_tool_failed
-        )
 
         self.thread.quit()
         self.thread.wait()

@@ -3,22 +3,29 @@ import json
 from brain.llm import LLM
 from tools.manager import ToolManager
 from tools.adapter import OpenAIToolAdapter
-from events.event_bus import event_bus
 
-from events.constants import Events
 
 class Agent:
 
     def __init__(self):
 
-
         self.llm = LLM()
-
         self.tool_manager = ToolManager()
-
         self.adapter = OpenAIToolAdapter()
 
+        # Callbacks (connected by AssistantWorker)
+        self.on_thinking_started = None
+        self.on_thinking_finished = None
+
+        self.on_tool_started = None
+        self.on_tool_finished = None
+        self.on_tool_failed = None
+
     def chat(self, messages):
+
+        # Notify GUI that thinking has started
+        if self.on_thinking_started:
+            self.on_thinking_started()
 
         response = self.llm.chat(
             messages,
@@ -27,24 +34,26 @@ class Agent:
 
         message = response.choices[0].message
 
+        # If no tools are needed, we're done thinking
         if not message.tool_calls:
+
+            if self.on_thinking_finished:
+                self.on_thinking_finished()
+
             return message.content
 
-        # Temporary conversation for the second LLM call
+        # Conversation for second LLM call
         agent_messages = messages.copy()
 
-        # Preserve the assistant's tool requests
         agent_messages.append(
             {
                 "role": "assistant",
                 "content": message.content,
-                "tool_calls": message.tool_calls
+                "tool_calls": message.tool_calls,
             }
         )
 
-        results = {}
-
-        # Execute every requested tool
+        # Execute requested tools
         for tool_call in message.tool_calls:
 
             tool_name = tool_call.function.name
@@ -53,12 +62,12 @@ class Agent:
             print(f"\nTool Requested: {tool_name}")
             print(f"Arguments: {arguments}")
 
-
-            event_bus.emit(
-                Events.TOOL_STARTED,
-                tool_name=tool_name,
-                arguments=arguments
-            )
+            # Notify tool started
+            if self.on_tool_started:
+                self.on_tool_started(
+                    tool_name,
+                    arguments
+                )
 
             try:
 
@@ -67,37 +76,44 @@ class Agent:
                     **arguments
                 )
 
-                event_bus.emit(
-                    Events.TOOL_SUCCEEDED,
-                    tool_name=tool_name,
-                    arguments=arguments,
-                    result=result
-                )
+                # Notify tool succeeded
+                if self.on_tool_finished:
+                    self.on_tool_finished(
+                        tool_name,
+                        arguments,
+                        str(result)
+                    )
 
             except Exception as e:
 
-                event_bus.emit(
-                    Events.TOOL_FAILED,
-                    tool_name=tool_name,
-                    arguments=arguments,
-                    error=str(e)
-                )
+                # Notify tool failed
+                if self.on_tool_failed:
+                    self.on_tool_failed(
+                        tool_name,
+                        arguments,
+                        str(e)
+                    )
+
+                # Stop thinking before re-raising
+                if self.on_thinking_finished:
+                    self.on_thinking_finished()
 
                 raise
 
-            results[tool_name] = result
-
-            # Add one tool message for THIS tool
+            # Send tool result back to the LLM
             agent_messages.append(
                 {
                     "role": "tool",
                     "tool_call_id": tool_call.id,
-                    "content": str(result)
+                    "content": str(result),
                 }
             )
 
         # Second LLM call
         final_response = self.llm.chat(agent_messages)
 
+        # Notify GUI that thinking has finished
+        if self.on_thinking_finished:
+            self.on_thinking_finished()
+
         return final_response.choices[0].message.content
-        
