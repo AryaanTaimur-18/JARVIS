@@ -1,14 +1,24 @@
 import webbrowser
 from urllib.parse import quote_plus
 from tools.decorators import tool
+import subprocess
 
 WEBSITES = {
     "google": "https://www.google.com",
     "youtube": "https://www.youtube.com",
+    "yt": "https://www.youtube.com",
+
     "github": "https://github.com",
+    "gh": "https://github.com",
+
     "linkedin": "https://www.linkedin.com",
+    "linkedin profile": "https://www.linkedin.com",
+
     "chatgpt": "https://chat.openai.com",
+    "openai": "https://chat.openai.com",
+
     "gmail": "https://mail.google.com",
+    "mail": "https://mail.google.com",
 }
 
 SEARCH_URLS = {
@@ -22,22 +32,28 @@ SEARCH_URLS = {
 
 @tool(
     name="open_website",
-    description="Open a website by name."
+    description="Open a website by name.",
+    direct_response=True
 )
 def open_website(website_name):
 
-    website_name = website_name.lower()
+    # Normalize the input
+    website_name = website_name.lower().strip()
 
-    if website_name.startswith(("http://", "https://")):
-        url = website_name
-    else:
-        url = WEBSITES.get(website_name)
+    website_name = website_name.replace("https://", "")
+    website_name = website_name.replace("http://", "")
+    website_name = website_name.replace("www.", "")
+
+    if website_name.endswith(".com"):
+        website_name = website_name[:-4]
+
+    url = WEBSITES.get(website_name)
 
     if url is None:
         return f"Sorry, I don't know how to open '{website_name}'."
 
     try:
-        webbrowser.open(url)
+        webbrowser.open_new_tab(url)
         return f"Opening {website_name.title()}."
 
     except Exception as e:
@@ -64,7 +80,10 @@ def search_web(platform, query):
     url = base_url + encoded_query
 
     try:
-        webbrowser.open(url)
+        subprocess.Popen(
+        ["cmd", "/c", "start", "", url],
+        shell=True
+        )
         return f"Searching {platform.title()} for '{query}'."
 
     except Exception as e:

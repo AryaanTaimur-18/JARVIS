@@ -53,36 +53,45 @@ class JarvisWindow(QMainWindow):
 
         self.worker = AssistantWorker(self.assistant)
 
+        from PySide6.QtCore import Qt
+
         self.process_message.connect(
-        self.worker.process
+            self.worker.process,
+            Qt.QueuedConnection
         )
 
         self.worker.finished.connect(
-        self.handle_assistant_response
+            self.worker.process,
+            Qt.QueuedConnection
         )
-
+    
         self.worker.moveToThread(self.thread)
 
         self.thread.start()
 
         self.worker.thinking_started.connect(
-            self.on_thinking_started
+            self.worker.process,
+            Qt.QueuedConnection
         )
 
         self.worker.thinking_finished.connect(
-            self.on_thinking_finished
+            self.worker.process,
+            Qt.QueuedConnection
         )
 
         self.worker.tool_started.connect(
-            self.on_tool_started
+            self.worker.process,
+            Qt.QueuedConnection
         )
 
         self.worker.tool_finished.connect(
-            self.on_tool_succeeded
+            self.worker.process,
+            Qt.QueuedConnection
         )
 
         self.worker.tool_failed.connect(
-            self.on_tool_failed
+            self.worker.process,
+            Qt.QueuedConnection
         )
 
         self.typewriter = TypeWriter()

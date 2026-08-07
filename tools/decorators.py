@@ -6,27 +6,26 @@ from tools.registry import registry
 def tool(
     name,
     description,
-    parameters=None
+    direct_response=False
 ):
 
     def decorator(func):
 
-        detected_parameters = parameters
+        signature = inspect.signature(func)
 
-        if detected_parameters is None:
+        parameters = {}
 
-            signature = inspect.signature(func)
-
-            detected_parameters = {}
-
-            for parameter in signature.parameters.values():
-                detected_parameters[parameter.name] = "string"
+        for parameter in signature.parameters.values():
+            parameters[parameter.name] = "string"
 
         registry.register(
-            name=name,
-            description=description,
-            function=func,
-            parameters=detected_parameters
+            {
+                "name": name,
+                "description": description,
+                "function": func,
+                "parameters": parameters,
+                "direct_response": direct_response,
+            }
         )
 
         return func

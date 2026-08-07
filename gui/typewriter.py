@@ -1,6 +1,5 @@
 from PySide6.QtCore import QObject, QTimer, Signal
 
-
 class TypeWriter(QObject):
 
     finished = Signal()

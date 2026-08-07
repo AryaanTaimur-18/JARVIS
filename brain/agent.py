@@ -71,6 +71,8 @@ class Agent:
 
             try:
 
+                tool = self.tool_manager.get_tool(tool_name)
+
                 result = self.tool_manager.execute(
                     tool_name,
                     **arguments
@@ -83,6 +85,13 @@ class Agent:
                         arguments,
                         str(result)
                     )
+
+                if tool.get("direct_response", False):
+                
+                    if self.on_thinking_finished:
+                        self.on_thinking_finished()
+
+                    return str(result)
 
             except Exception as e:
 

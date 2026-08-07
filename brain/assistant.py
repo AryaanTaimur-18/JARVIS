@@ -7,7 +7,6 @@ from tools.manager import ToolManager
 from tools.loader import ToolLoader
 from events.event_bus import event_bus
 
-
 class Assistant:
     """
     Main controller of the assistant.
@@ -41,28 +40,20 @@ class Assistant:
 
             print(tool["name"])
 
-        
         print("JARVIS is ready!\n")
 
     def process(self, text):
 
         self.memory.add_user_message(text)
 
-        from events.constants import Events
-
-        event_bus.emit(Events.THINKING_STARTED)
-
-        try:
-            response = self.agent.chat(
-                self.memory.get_messages()
-            )
-        finally:
-            event_bus.emit(Events.THINKING_FINISHED)
+        response = self.agent.chat(
+            self.memory.get_messages()
+        )
 
         self.memory.add_assistant_message(response)
 
         return response
-
+    
     def listen_once(self):
 
         input("Press Enter to start recording...")
@@ -92,7 +83,4 @@ class Assistant:
                 self.listen_once()
 
         except KeyboardInterrupt:
-            print("\n\nShutting down JARVIS...")
-
-
-                    
+            print("\n\nShutting down JARVIS...")                    

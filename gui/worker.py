@@ -17,6 +17,7 @@ class AssistantWorker(QObject):
 
         self.assistant = assistant
 
+        # Connect Agent callbacks to Qt signals
         assistant.on_thinking_started = self.thinking_started.emit
         assistant.on_thinking_finished = self.thinking_finished.emit
 
