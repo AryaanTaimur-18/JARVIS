@@ -4,6 +4,8 @@ from brain.llm import LLM
 from tools.manager import ToolManager
 from tools.adapter import OpenAIToolAdapter
 
+from events.event_bus import event_bus
+
 
 class Agent:
 
@@ -13,19 +15,10 @@ class Agent:
         self.tool_manager = ToolManager()
         self.adapter = OpenAIToolAdapter()
 
-        # Callbacks (connected by AssistantWorker)
-        self.on_thinking_started = None
-        self.on_thinking_finished = None
-
-        self.on_tool_started = None
-        self.on_tool_finished = None
-        self.on_tool_failed = None
-
     def chat(self, messages):
 
         # Notify GUI that thinking has started
-        if self.on_thinking_started:
-            self.on_thinking_started()
+        event_bus.thinking_started.emit()
 
         response = self.llm.chat(
             messages,
@@ -37,8 +30,7 @@ class Agent:
         # If no tools are needed, we're done thinking
         if not message.tool_calls:
 
-            if self.on_thinking_finished:
-                self.on_thinking_finished()
+            event_bus.thinking_finished.emit()
 
             return message.content
 
@@ -63,11 +55,10 @@ class Agent:
             print(f"Arguments: {arguments}")
 
             # Notify tool started
-            if self.on_tool_started:
-                self.on_tool_started(
-                    tool_name,
-                    arguments
-                )
+            event_bus.tool_started.emit(
+                tool_name,
+                arguments
+            )
 
             try:
 
@@ -79,33 +70,29 @@ class Agent:
                 )
 
                 # Notify tool succeeded
-                if self.on_tool_finished:
-                    self.on_tool_finished(
-                        tool_name,
-                        arguments,
-                        str(result)
-                    )
+                event_bus.tool_succeeded.emit(
+                    tool_name,
+                    arguments,
+                    str(result)
+                )
 
                 if tool.get("direct_response", False):
                 
-                    if self.on_thinking_finished:
-                        self.on_thinking_finished()
+                    event_bus.thinking_finished.emit()
 
                     return str(result)
 
             except Exception as e:
 
                 # Notify tool failed
-                if self.on_tool_failed:
-                    self.on_tool_failed(
-                        tool_name,
-                        arguments,
-                        str(e)
-                    )
+                event_bus.tool_failed.emit(
+                    tool_name,
+                    arguments,
+                    str(e)
+                )
 
                 # Stop thinking before re-raising
-                if self.on_thinking_finished:
-                    self.on_thinking_finished()
+                event_bus.thinking_finished.emit()
 
                 raise
 
@@ -122,7 +109,6 @@ class Agent:
         final_response = self.llm.chat(agent_messages)
 
         # Notify GUI that thinking has finished
-        if self.on_thinking_finished:
-            self.on_thinking_finished()
+        event_bus.thinking_finished.emit()
 
         return final_response.choices[0].message.content

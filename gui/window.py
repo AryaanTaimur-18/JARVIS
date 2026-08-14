@@ -9,7 +9,8 @@ from PySide6.QtWidgets import (
 from gui.chat import ChatWidget
 from gui.input_bar import InputBar
 from gui.status_bar import StatusBar
-from events.constants import Events
+
+from events.event_bus import event_bus
 
 from gui.messages import TOOL_MESSAGES
 
@@ -61,7 +62,7 @@ class JarvisWindow(QMainWindow):
         )
 
         self.worker.finished.connect(
-            self.worker.process,
+            self.handle_assistant_response,
             Qt.QueuedConnection
         )
     
@@ -69,29 +70,24 @@ class JarvisWindow(QMainWindow):
 
         self.thread.start()
 
-        self.worker.thinking_started.connect(
-            self.worker.process,
-            Qt.QueuedConnection
+        event_bus.thinking_started.connect(
+            self.on_thinking_started
         )
 
-        self.worker.thinking_finished.connect(
-            self.worker.process,
-            Qt.QueuedConnection
+        event_bus.thinking_finished.connect(
+            self.on_thinking_finished
         )
 
-        self.worker.tool_started.connect(
-            self.worker.process,
-            Qt.QueuedConnection
+        event_bus.tool_started.connect(
+            self.on_tool_started
         )
 
-        self.worker.tool_finished.connect(
-            self.worker.process,
-            Qt.QueuedConnection
+        event_bus.tool_succeeded.connect(
+            self.on_tool_succeeded
         )
 
-        self.worker.tool_failed.connect(
-            self.worker.process,
-            Qt.QueuedConnection
+        event_bus.tool_failed.connect(
+            self.on_tool_failed
         )
 
         self.typewriter = TypeWriter()

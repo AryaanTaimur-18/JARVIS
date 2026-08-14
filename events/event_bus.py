@@ -1,26 +1,17 @@
-from collections import defaultdict
+from PySide6.QtCore import QObject, Signal
 
 
-class EventBus:
+class EventBus(QObject):
+
+    thinking_started = Signal()
+    thinking_finished = Signal()
+
+    tool_started = Signal(str, dict)
+    tool_succeeded = Signal(str, dict, str)
+    tool_failed = Signal(str, dict, str)
 
     def __init__(self):
+        super().__init__()
 
-        self._listeners = defaultdict(list)
-
-    def on(self, event_name, callback):
-
-        self._listeners[event_name].append(callback)
-
-    def off(self, event_name, callback):
-    
-            if callback in self._listeners[event_name]:
-                self._listeners[event_name].remove(callback)
-
-    def emit(self, event_name, **data):
-
-        for callback in self._listeners[event_name]:
-            callback(**data) 
 
 event_bus = EventBus()
-
-    
