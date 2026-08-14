@@ -62,8 +62,6 @@ class Assistant:
 
         text = self.transcriber.transcribe(audio)
 
-        self.memory.add_user_message(text)
-
         print(f"\nYou said: {text}\n")
 
         print("Thinking...\n")
